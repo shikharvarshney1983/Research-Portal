@@ -1,1 +1,58 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .company-card {
+    @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100;
+  }
+  
+  .company-card-mini {
+    @apply bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 border border-gray-100 p-3 text-center cursor-pointer min-h-[60px] flex items-center justify-center;
+  }
+  
+  .company-card-mini:hover {
+    @apply bg-primary-50 border-primary-200;
+  }
+  
+  .section-header {
+    @apply text-2xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-primary-500;
+  }
+  
+  .alphabet-badge {
+    @apply inline-flex items-center justify-center w-10 h-10 bg-primary-500 text-white font-bold text-lg rounded-full shadow-lg;
+  }
+  
+  .stats-card {
+    @apply bg-gradient-to-br from-primary-500 to-accent-500 text-white rounded-xl p-6 shadow-lg;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
