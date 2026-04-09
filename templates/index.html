@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-16">
+        <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-navy text-gold text-[10px] font-bold uppercase tracking-[0.2em] border border-gold/30">
+            Quantum Investment Championship 2026
+        </div>
+        <h1 class="text-4xl md:text-6xl font-black text-navy mb-6 tracking-tight">
+            Institutional <span class="text-gold">Research</span> Portal
+        </h1>
+        <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            High-conviction analysis and proprietary valuation models developed by <strong>Team Sudarshan</strong> for the Quantum Investment Championship.
+        </p>
+    </div>
+
+    <!-- Search Terminal -->
+    <div class="relative max-w-2xl mx-auto mb-16">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="text" id="searchInput" placeholder="Search by company name or ticker..." 
+               class="block w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:border-gold focus:ring-0 transition-all text-navy font-medium placeholder:text-gray-300 shadow-sm">
+    </div>
+
+    <!-- Research Grid -->
+    {% if companies_by_date %}
+        {# 1. Flatten the list #}
+        {% set flat_list = [] %}
+        {% for date, companies in companies_by_date %}
+            {% for company in companies %}
+                {% set _ = flat_list.append(company) %}
+            {% endfor %}
+        {% endfor %}
+
+        {# 2. Custom Sorting Logic: Federal #1, Tanfac #2, Others Alphabetical #}
+        {% set federal = [] %}
+        {% set tanfac = [] %}
+        {% set others = [] %}
+
+        {% for company in flat_list %}
+            {% set fname = company.filename|lower %}
+            {% if fname == 'federalbnk.html' %}
+                {% set _ = federal.append(company) %}
+            {% elif fname == 'tanfac.html' %}
+                {% set _ = tanfac.append(company) %}
+            {% else %}
+                {% set _ = others.append(company) %}
+            {% endif %}
+        {% endfor %}
+
+        {% set sorted_others = others|sort(attribute='display_name') %}
+        {% set final_list = federal + tanfac + sorted_others %}
+
+        {# Priority filename map for style checks #}
+        {% set priority_filenames = [
+            'federalbnk.html', 'tanfac.html', 'shilctech.html', 'tvsmotor.html', 
+            'solarinds.html', 'dixon.html', 'pricolltd.html', 'adaniports.html', 
+            'aplapollo.html', 'cumminsind.html', 'gvt&d.html', 'kei.html', 
+            'lauraslabs.html', 'maruti.html'
+        ] %}
+
+        {# Color palette for standard coverage #}
+        {% set colors = [
+            {'bg': 'bg-emerald-50', 'text': 'text-emerald-700', 'border': 'group-hover:border-emerald-200'},
+            {'bg': 'bg-indigo-50', 'text': 'text-indigo-700', 'border': 'group-hover:border-indigo-200'},
+            {'bg': 'bg-rose-50', 'text': 'text-rose-700', 'border': 'group-hover:border-rose-200'},
+            {'bg': 'bg-amber-50', 'text': 'text-amber-700', 'border': 'group-hover:border-amber-200'},
+            {'bg': 'bg-cyan-50', 'text': 'text-cyan-700', 'border': 'group-hover:border-cyan-200'},
+            {'bg': 'bg-violet-50', 'text': 'text-violet-700', 'border': 'group-hover:border-violet-200'},
+            {'bg': 'bg-teal-50', 'text': 'text-teal-700', 'border': 'group-hover:border-teal-200'}
+        ] %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for company in final_list %}
+                {% set fname = company.filename|lower %}
+                {% set is_priority = (fname in priority_filenames) %}
+                {% set is_final = (fname == 'federalbnk.html') %}
+                {% set is_semi_final = (fname == 'tanfac.html') %}
+                {% set is_alfa = (fname == 'shilctech.html') %}
+                {% set is_infinity = (fname == 'tvsmotor.html') %}
+                {% set is_dhanchakra = (fname.startswith('solarinds')) %}
+                {% set is_agnikul = (fname.startswith('dixon')) %}
+                {% set is_zencompounder = (fname.startswith('pricolltd')) %}
+                {% set is_uncutdiamonds = (fname.startswith('adaniports')) %}
+                {% set is_panchvaayu = (fname.startswith('aplapollo')) %}
+                {% set is_vaayusena = (fname.startswith('cumminsind')) %}
+                {% set is_vasudhaiv = (fname.startswith('gvt&d')) %}
+                {% set is_fireball = (fname.startswith('kei')) %}
+                {% set is_precisioncompounding = (fname.startswith('lauraslabs')) %}
+                {% set is_agnipath = (fname.startswith('maruti')) %}
+                
+                {% set color = colors[loop.index0 % colors|length] %}
+
+                <a href="/company/{{ company.filename }}" 
+                    class="searchable-item group block relative bg-white rounded-2xl border-2 {{ 'border-gold shadow-lg ring-1 ring-gold/20' if is_final or is_semi_final else 'border-gray-100 shadow-sm' if is_priority else 'border-transparent shadow-sm hover:shadow-md' }} hover:border-gold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden {{ '' if is_priority else color.border }}" 
+                    data-company="{{ company.display_name|lower }}">
+                    
+                    <div class="absolute top-0 right-0 z-10">
+                        {% if is_final %}
+                            <div class="bg-navy text-gold text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">FINAL ENTRY</div>
+                        {% elif is_semi_final %}
+                            <div class="bg-navy text-gold text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">SEMI FINAL ENTRY</div>
+                        {% elif is_alfa %}
+                            <div class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">ALFAFORGE</div>
+                        {% elif is_infinity %}
+                            <div class="bg-purple-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">INFINITY9</div>
+                        {% elif is_dhanchakra %}
+                            <div class="bg-orange-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">DHANCHAKRA</div>
+                        {% elif is_agnikul %}
+                            <div class="bg-red-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">AGNIKUL</div>
+                        {% elif is_zencompounder %}
+                            <div class="bg-emerald-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">ZEN COMPOUNDER</div>
+                        {% elif is_uncutdiamonds %}
+                            <div class="bg-slate-700 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">UNCUT DIAMONDS</div>
+                        {% elif is_panchvaayu %}
+                            <div class="bg-cyan-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">PANCHVAAYU</div>
+                        {% elif is_vaayusena %}
+                            <div class="bg-sky-700 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">VAAYUSENA</div>
+                        {% elif is_vasudhaiv %}
+                            <div class="bg-teal-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">VASUDHAIV</div>
+                        {% elif is_fireball %}
+                            <div class="bg-rose-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">FIREBALL</div>
+                        {% elif is_precisioncompounding %}
+                            <div class="bg-indigo-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">PRECISION COMPOUNDING</div>
+                        {% elif is_agnipath %}
+                            <div class="bg-amber-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg shadow-sm">AGNIPATH</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-6">
+                        <div class="w-14 h-14 {{ 'bg-gray-50' if is_priority else color.bg }} rounded-xl flex items-center justify-center mb-4 border border-gray-100 overflow-hidden">
+                            <img src="/static/{{ company.name|lower }}.jpg" 
+                                 alt="{{ company.display_name }}" 
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23f3f4f6\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'40\'>📊</text></svg>'"
+                                 class="w-full h-full object-contain p-2">
+                        </div>
+                        <h3 class="text-lg font-bold text-navy group-hover:{{ 'text-gold' if is_priority else color.text }} transition-colors">{{ company.display_name }}</h3>
+                        <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-bold">
+                            {{ 'Priority Research' if is_priority else 'Standard Coverage' }}
+                        </p>
+                        <div class="mt-8 flex items-center text-xs font-bold {{ 'text-gold' if is_priority else color.text }} {{ 'transition-opacity' if is_priority else 'opacity-0 group-hover:opacity-100 transition-opacity' }}">
+                            {{ 'OPEN RESEARCH' if is_priority else 'VIEW ANALYSIS' }} 
+                            <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
+            <p class="text-gray-400 font-medium">Terminal offline. No reports found.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.searchable-item').forEach(item => {
+            const companyName = item.dataset.company;
+            item.style.display = companyName.includes(searchTerm) ? 'block' : 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ report_title }} | Team Sudarshan Terminal{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-[calc(100vh-80px)] overflow-hidden">
+    <!-- Contextual Report Header -->
+    <div class="bg-white border-b border-gray-200 px-4 sm:px-8 py-4 flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-4">
+            <a href="/" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-navy">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h2 class="text-sm font-bold text-navy uppercase tracking-tight">{{ report_title }}</h2>
+                    
+                    {# Special Entry Badges #}
+                    {# Using trim and lower for maximum robustness #}
+                    {% set clean_filename = filename|trim|lower %}
+                    
+                    {% if clean_filename == 'federalbnk.html' %}
+                        <span id="final-entry-badge" class="bg-navy text-gold text-[9px] font-black px-2 py-0.5 rounded border border-gold/30 flex items-center shadow-sm">
+                            <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            FINAL ENTRY
+                        </span>
+                    {% elif filename.upper().startswith('TANFAC') %}
+                        <span class="bg-gold/10 text-gold text-[9px] font-black px-2 py-0.5 rounded border border-gold/30">
+                            SEMI FINAL ENTRY
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-gray-400 font-medium tracking-wider">CONVICTION: HIGH</span>
+                    <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                    <span class="text-[10px] text-gray-400 font-medium tracking-wider">STATUS: PUBLISHED</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <button onclick="printReport()" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-all active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                <span>Print Report</span>
+            </button>
+            <div class="h-6 w-px bg-gray-200 hidden sm:block mx-1"></div>
+            <div class="flex items-center space-x-1 px-2.5 py-1 bg-green-50 rounded text-green-700 text-[10px] font-bold border border-green-100">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                <span>SECURE ACCESS</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Frame -->
+    <div class="flex-1 bg-gray-100 relative">
+        <iframe 
+            id="reportFrame"
+            src="{{ url_for('serve_report', filename=filename) }}" 
+            class="w-full h-full border-0 shadow-inner"
+            title="{{ report_title }} Report">
+        </iframe>
+    </div>
+</div>
+
+<script>
+    function printReport() {
+        const frame = document.getElementById('reportFrame');
+        if (frame && frame.contentWindow) {
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+        } else {
+            window.print();
+        }
+    }
+
+    // Debugging Script - Open your browser console (F12) to see these logs
+    console.log("--- Report Terminal Debug ---");
+    console.log("Filename passed from server:", "{{ filename }}");
+    console.log("Normalized check value:", "{{ filename|trim|lower }}");
+    console.log("Is it Federal Bank match?:", "{{ filename|trim|lower == 'federalbnk.html' }}");
+    console.log("-----------------------------");
+</script>
+{% endblock %}
