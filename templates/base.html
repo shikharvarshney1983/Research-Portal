@@ -1,1 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Team Sudarshan | Quantum Research{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #001F3F;
+            --gold: #C5A059;
+            --gold-light: #D4AF37;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
+        .bg-navy { background-color: var(--navy); }
+        .text-gold { color: var(--gold); }
+        .text-navy { color: var(--navy); }
+        .bg-gold { background-color: var(--gold); }
+        .border-gold { border-color: var(--gold); }
+        
+        /* Responsive Chat Widget */
+        #chat-widget {
+            position: fixed; 
+            bottom: 85px; 
+            right: 20px; 
+            z-index: 1000;
+            width: 450px; 
+            max-height: calc(100dvh - 120px); 
+            display: none; 
+            flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            border-radius: 12px; 
+            overflow: hidden;
+            background: white; 
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        @media (max-width: 640px) {
+            #chat-widget {
+                width: calc(100% - 24px);
+                right: 12px;
+                left: 12px;
+                bottom: 80px;
+                border-radius: 16px;
+            }
+            #chat-messages { padding: 12px !important; gap: 12px !important; }
+            .msg { max-width: 95% !important; font-size: 0.9rem !important; }
+            nav h1 { font-size: 1.1rem !important; }
+        }
+
+        .chat-header { background: var(--navy); color: var(--gold); padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        #chat-messages { 
+            flex: 1; overflow-y: auto; padding: 20px; background: #f8fafc; 
+            min-height: 350px; display: flex; flex-direction: column; gap: 15px; 
+        }
+        .msg { padding: 12px 16px; border-radius: 12px; max-width: 90%; font-size: 0.95rem; line-height: 1.5; }
+        .msg-user { align-self: flex-end; background: var(--navy); color: white; border-bottom-right-radius: 2px; }
+        .msg-bot { align-self: flex-start; background: white; color: #1e293b; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
+        
+        /* Loading Dots Animation */
+        .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 4px 8px; }
+        .dot { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; animation: pulse 1.5s infinite; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 1; } }
+
+        /* Markdown Styling */
+        .msg-bot h1, .msg-bot h2, .msg-bot h3 { font-weight: bold; margin-bottom: 0.5rem; color: var(--navy); }
+        .msg-bot p { margin-bottom: 0.75rem; }
+        .msg-bot ul, .msg-bot ol { margin-left: 1.2rem; margin-bottom: 0.75rem; list-style-type: disc; }
+        .msg-bot table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.85rem; display: block; overflow-x: auto; }
+        .msg-bot th, .msg-bot td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; min-width: 80px; }
+        .msg-bot th { background: #f1f5f9; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav class="bg-navy border-b border-gold shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2 sm:space-x-4">
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-lg sm:rounded-xl flex items-center justify-center border-2 border-gold overflow-hidden shadow-inner shrink-0">
+                            <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Team Sudarshan Logo" class="w-full h-full object-cover">
+                        </div>
+                        <div class="overflow-hidden">
+                            <h1 class="text-lg sm:text-2xl font-extrabold text-white tracking-tight leading-none mb-1 truncate">TEAM <span class="text-gold">SUDARSHAN</span></h1>
+                            <p class="hidden sm:block text-[10px] text-gray-400 uppercase tracking-widest font-bold">Quantum Investment Championship</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-3 sm:space-x-6">
+                    <a href="/" class="text-white hover:text-gold text-xs sm:text-sm font-medium transition-colors">Portal</a>
+                    <div class="bg-gold px-2 py-1 sm:px-3 sm:py-1.5 rounded-md text-navy font-black text-[9px] sm:text-[11px] uppercase tracking-wider shadow-sm border border-yellow-300 whitespace-nowrap">
+                        OFFICIAL ENTRY
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-navy text-white mt-12 border-t border-gold px-4 py-8 sm:py-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+            <div class="flex items-center space-x-4">
+                <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo" class="w-10 h-10 rounded border border-gold">
+                <div>
+                    <h3 class="text-gold font-bold text-lg leading-none">Team Sudarshan</h3>
+                    <p class="text-gray-500 text-[10px] uppercase tracking-widest mt-1">QIC 2026 Participation</p>
+                </div>
+            </div>
+            <div class="text-center md:text-right text-[11px] text-gray-500">
+                <p>© 2026 Team Sudarshan.</p>
+                <p class="mt-1"><a href="mailto:qicteamsudarshan@gmail.com" class="text-gold hover:underline">qicteamsudarshan@gmail.com</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="chat-widget">
+        <div class="chat-header">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-sm">Analyst Terminal</span>
+            </div>
+            <button onclick="closeChat()" class="text-3xl font-light hover:text-white leading-none">&times;</button>
+        </div>
+        <div id="chat-messages">
+            <div class="msg msg-bot">Welcome to the Team Sudarshan Terminal. Please select a report from the dashboard to begin our analysis.</div>
+        </div>
+        <div class="p-3 sm:p-4 bg-white border-t flex space-x-2">
+            <input type="text" id="chat-input" placeholder="Ask about financials..." class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-gold focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400">
+            <button id="chat-send" onclick="sendMessage()" class="bg-navy text-gold p-2 rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <button onclick="toggleChat()" id="chat-toggle" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 bg-navy text-gold rounded-full shadow-2xl border-2 border-gold flex items-center justify-center hover:scale-110 transition-transform z-[1001]">
+        <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </button>
+
+    <script>
+        const chatWidget = document.getElementById('chat-widget');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        let chatHistory = [];
+        const currentCompany = "{{ filename if filename else '' }}";
+
+        marked.setOptions({ breaks: true, gfm: true });
+
+        function toggleChat() {
+            if (chatWidget.style.display === 'flex') {
+                chatWidget.style.display = 'none';
+            } else {
+                chatWidget.style.display = 'flex';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatInput.focus();
+            }
+        }
+
+        function closeChat() { chatWidget.style.display = 'none'; }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message || chatInput.disabled) return;
+
+            // UI feedback: Disable inputs
+            setChatState(true);
+            appendMessage('user', message);
+            chatInput.value = '';
+
+            // Add visual loading indicator
+            const loadingId = appendLoadingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        history: chatHistory,
+                        current_company: currentCompany
+                    })
+                });
+                const data = await response.json();
+                
+                // Remove loading indicator
+                removeLoadingIndicator(loadingId);
+
+                if (data.response) {
+                    appendMessage('bot', data.response);
+                    chatHistory.push({ role: 'user', content: message });
+                    chatHistory.push({ role: 'assistant', content: data.response });
+                } else if (data.error) {
+                    appendMessage('bot', "The terminal encountered an error processing your query.");
+                }
+            } catch (e) {
+                removeLoadingIndicator(loadingId);
+                appendMessage('bot', "Connection to the central research server was interrupted.");
+            } finally {
+                setChatState(false);
+                chatInput.focus();
+            }
+        }
+
+        function setChatState(disabled) {
+            chatInput.disabled = disabled;
+            chatSend.disabled = disabled;
+        }
+
+        function appendLoadingIndicator() {
+            const id = 'loading-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'msg msg-bot';
+            div.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
+        }
+
+        function removeLoadingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `msg msg-${role}`;
+            if (role === 'bot') {
+                div.innerHTML = marked.parse(text);
+            } else {
+                div.innerText = text;
+            }
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
